@@ -492,11 +492,13 @@ impl<E: EthSpec> ExecutionPayloadBodyV1<E> {
     ) -> Result<ExecutionPayload<E>, String> {
         match header {
             ExecutionPayloadHeader::Merge(header) => {
-                if self.withdrawals.is_some() {
-                    return Err(format!(
-                        "block {} is merge but payload body has withdrawals",
-                        header.block_hash
-                    ));
+                if let Some(ref withdrawals) = self.withdrawals {
+                    if !withdrawals.is_empty() {
+                        return Err(format!(
+                            "block {} is merge but payload body has withdrawals",
+                            header.block_hash
+                        ));
+                    }
                 }
                 Ok(ExecutionPayload::Merge(ExecutionPayloadMerge {
                     parent_hash: header.parent_hash,
